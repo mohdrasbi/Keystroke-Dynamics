@@ -148,22 +148,22 @@ class ExtractFeatures:
 				feat_ht = "{}_ht".format(self.info_dict[curr_key])
 
 				feat_values[self.feat_map[feat_transition]].append(curr_time - prev_time)
-				feat_values[self.feat_map[feat_ht]].append(curr['hold_time'])
+				feat_values[self.feat_map[feat_ht]].append(float(curr['hold_time']))
 			
 			elif curr_key == "Key.space":
 				feat_values[self.feat_map["sb_dd"]].append(curr_time - prev_time)
-				feat_values[self.feat_map["sb_ht"]].append(curr['hold_time'])
+				feat_values[self.feat_map["sb_ht"]].append(float(curr['hold_time']))
 			
 			elif curr_key in shift:
 				feat_ht = "{}_ht".format(self.info_dict[self.df.iloc[i+1]['key'].upper()])
-				feat_values[self.feat_map[feat_ht]].append(curr['hold_time'])
+				feat_values[self.feat_map[feat_ht]].append(float(curr['hold_time']))
 			
 			elif prev_key == "Key.space":
 				feat_transition = 'key_sb'
 				feat_ht = "{}_ht".format(self.info_dict[curr_key])
 				
 				feat_values[self.feat_map[feat_transition]].append(curr_time - prev_time)
-				feat_values[self.feat_map[feat_ht]].append(curr['hold_time'])
+				feat_values[self.feat_map[feat_ht]].append(float(curr['hold_time']))
 			
 			else:		
 				temp = ""
@@ -184,7 +184,8 @@ class ExtractFeatures:
 				feat_values[self.feat_map['accuracy']].append(100 - (backspaces/i*100))
 				feat_values[self.feat_map['user']].append(self.user_id)
 
-				self.new_df.loc[index] = list(map(lambda x: np.mean(x) if len(x) > 0 else np.nan, feat_values))
+				new_df.loc[index] = list(map(lambda x: np.mean(x) if len(x) > 0 else np.nan, feat_values))
+
 				index += 1
 				bin_size += bin_size_const
 				feat_values = [[] for i in range(len(self.features))]
