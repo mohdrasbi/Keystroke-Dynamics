@@ -1,7 +1,6 @@
 from functions import *
 
 
-
 user = str(input("Enter username: "))
 user_ids = pd.read_csv("log/user_ids.csv")
 user_id = user_ids.shape[0]
