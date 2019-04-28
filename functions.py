@@ -106,6 +106,9 @@ class ExtractFeatures:
 		self.info_dict, self.features = self.initialize()
 		self.feat_map = {self.features[i]: i for i in range(len(self.features))}
 		self.new_df = self.extract_features()
+
+		self.new_df = self.new_df.fillna(self.new_df.mean())
+		self.new_df = self.new_df.fillna(0)
 		
 		self.save_file(self.new_df)
 
@@ -146,7 +149,7 @@ class ExtractFeatures:
 
 			if curr_key.isupper():
 				continue
-				
+
 			if curr_key not in info_dict_keys or prev_key not in info_dict_keys:
 				if (curr_key != "Key.space") and (prev_key != "Key.space") and (curr_key not in shift):
 					continue
