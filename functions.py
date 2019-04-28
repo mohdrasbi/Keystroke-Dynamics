@@ -151,7 +151,7 @@ class ExtractFeatures:
 				continue
 
 			if curr_key not in info_dict_keys or prev_key not in info_dict_keys:
-				if (curr_key != "Key.space") and (prev_key != "Key.space") and (curr_key not in shift):
+				if ((curr_key != "Key.space") and (prev_key != "Key.space") and (curr_key not in shift)) or (curr_key not in info_dict_keys):
 					continue
 				
 
