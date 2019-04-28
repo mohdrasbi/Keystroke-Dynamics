@@ -53,7 +53,7 @@ class CollectData:
 		except KeyError:
 			try:
 				key_info = self.extract_raw_data(key_name.upper(), release_time)
-			except KeyError:
+			except:
 				key_info = None
 
 		if key_info != None:
@@ -124,6 +124,8 @@ class ExtractFeatures:
 		backspaces = 0
 		shift = ["Key.shift", "Key.shift_r"]
 
+		info_dict_keys = list(self.info_dict.keys())
+
 		for i in range(1, length):
 			prev = self.df.iloc[i-1]
 			prev_key = prev['key']
@@ -134,15 +136,16 @@ class ExtractFeatures:
 			curr_time = float(curr['press_time'])
 			
 			time_diff = curr_time - start_time
-			if curr_key.isupper() or prev_key in shift or prev_key == "Key.backspace" \
-			or prev_key == 'Key.enter' or curr_key == 'Key.enter':
-				continue
-				
-				
+
 			if curr_key == "Key.backspace":
 				backspaces += 1
 				continue
-			
+
+			if curr_key not in info_dict_keys or prev_key not in info_dict_keys:
+				if (curr_key != "Key.space") and (prev_key != "Key.space") and (curr_key not in shift):
+					continue
+				
+
 			if (curr_key in self.info_dict.keys()) and (prev_key in self.info_dict.keys()) and (self.info_dict[curr_key] == self.info_dict[prev_key]):
 				feat_transition = "{}_same".format(self.info_dict[curr_key])
 				feat_ht = "{}_ht".format(self.info_dict[curr_key])
@@ -155,9 +158,12 @@ class ExtractFeatures:
 				feat_values[self.feat_map["sb_ht"]].append(float(curr['hold_time']))
 			
 			elif curr_key in shift:
-				feat_ht = "{}_ht".format(self.info_dict[self.df.iloc[i+1]['key'].upper()])
-				feat_values[self.feat_map[feat_ht]].append(float(curr['hold_time']))
-			
+				next_key = self.df.iloc[i+1]['key'].upper()
+
+				if next_key in info_dict_keys:
+					feat_ht = "{}_ht".format(self.info_dict[next_key])
+					feat_values[self.feat_map[feat_ht]].append(float(curr['hold_time']))
+
 			elif prev_key == "Key.space":
 				feat_transition = 'key_sb'
 				feat_ht = "{}_ht".format(self.info_dict[curr_key])
@@ -200,23 +206,23 @@ class ExtractFeatures:
 		info_dict.update(dict.fromkeys(["w", "s", "x", "2"], "lr"))
 		info_dict.update(dict.fromkeys(["e", "d", "c", "3"], "lm"))
 		info_dict.update(dict.fromkeys(["r", "t", "f", "g", "v", "b", "4", "5"], 'li'))
-		info_dict.update(dict.fromkeys(["!", "Q", "A", "Z"], 'll_cap'))
-		info_dict.update(dict.fromkeys(["@", "W", "S", "X"], 'lr_cap'))
-		info_dict.update(dict.fromkeys(["#", "E", "D", "C"], 'lm_cap'))
-		info_dict.update(dict.fromkeys(["$", "R", "F", "V", "%", "T", "G", "B"], 'li_cap'))
+		info_dict.update(dict.fromkeys(["!", "Q", "A", "Z"], 'l_cap'))
+		info_dict.update(dict.fromkeys(["@", "W", "S", "X"], 'l_cap'))
+		info_dict.update(dict.fromkeys(["#", "E", "D", "C"], 'l_cap'))
+		info_dict.update(dict.fromkeys(["$", "R", "F", "V", "%", "T", "G", "B"], 'l_cap'))
 		info_dict.update(dict.fromkeys(["y", "u", 'h', 'j', 'n', 'm', '6', '7'], 'ri'))
 		info_dict.update(dict.fromkeys(['i', 'k', ',', '8'], 'rm'))
 		info_dict.update(dict.fromkeys(['.', '9', 'o', 'l'], 'rr'))
 		info_dict.update(dict.fromkeys(['0', 'p', ';', '/', '[', "'", "`", ']', '=', '-'], 'rl'))
-		info_dict.update(dict.fromkeys(["^", "Y", "H", "N", "&", "U", "J", "M"], 'ri_cap'))
-		info_dict.update(dict.fromkeys(["*", "I", "K", "<"], 'rm_cap'))
-		info_dict.update(dict.fromkeys(["(", "O", "L", ">"], 'rr_cap'))
-		info_dict.update(dict.fromkeys([")", "P", ":", "?", "{", "}", '"', '+', '_'], 'rl_cap'))
+		info_dict.update(dict.fromkeys(["^", "Y", "H", "N", "&", "U", "J", "M"], 'r_cap'))
+		info_dict.update(dict.fromkeys(["*", "I", "K", "<"], 'r_cap'))
+		info_dict.update(dict.fromkeys(["(", "O", "L", ">"], 'r_cap'))
+		info_dict.update(dict.fromkeys([")", "P", ":", "?", "{", "}", '"', '+', '_'], 'r_cap'))
 
-		features = ["ri_left", "ri_right", "ri_same", "ri_ht", "ri_cap_ht", 
-			"rm_left", "rm_right", "rm_same", "rm_ht", "rm_cap_ht", "rr_left", "rr_right", "rr_same", "rr_ht", "rr_cap_ht", "rl_left", "rl_right", 
-			"rl_same", "rl_ht", "rl_cap_ht", 'li_left', 'li_right', 'li_same', 'li_ht', 'li_cap_ht', 'lm_left', 'lm_right', 'lm_same', 'lm_ht', 
-			'lm_cap_ht', 'lr_left', 'lr_right', 'lr_same', 'lr_ht', 'lr_cap_ht', 'll_left', 'll_right', 'll_same', 'll_ht', 'll_cap_ht', 'cpm', 
+		features = ["ri_left", "ri_right", "ri_same", "ri_ht",
+			"rm_left", "rm_right", "rm_same", "rm_ht", "rr_left", "rr_right", "rr_same", "rr_ht", "r_cap_ht", "rl_left", "rl_right",
+			"rl_same", "rl_ht", 'li_left', 'li_right', 'li_same', 'li_ht', 'l_cap_ht', 'lm_left', 'lm_right', 'lm_same', 'lm_ht',
+			'lr_left', 'lr_right', 'lr_same', 'lr_ht', 'll_left', 'll_right', 'll_same', 'll_ht', 'cpm',
 			'sb_dd', 'sb_ht', 'key_sb', 'accuracy', 'user']
 
 		return info_dict, features
