@@ -115,7 +115,7 @@ class ExtractFeatures:
 
 		start_time = float(self.df.iloc[0]['press_time'])
 
-		bin_size_const = 10
+		bin_size_const = 20
 		bin_size = bin_size_const
 
 		feat_values = [[] for i in range(len(self.features))]
@@ -141,6 +141,12 @@ class ExtractFeatures:
 				backspaces += 1
 				continue
 
+			if curr_key == None:
+				continue
+
+			if curr_key.isupper():
+				continue
+				
 			if curr_key not in info_dict_keys or prev_key not in info_dict_keys:
 				if (curr_key != "Key.space") and (prev_key != "Key.space") and (curr_key not in shift):
 					continue
