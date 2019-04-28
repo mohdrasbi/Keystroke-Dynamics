@@ -13,6 +13,6 @@ else:
 	user_ids.to_csv("log/user_ids.csv", index=False)
 
 
-raw_data = CollectData(user_id).return_df()
+raw_data = CollectData(user_id, "test_data").return_df()
 
-final_data = ExtractFeatures(raw_data, user_id)
+final_data = ExtractFeatures(raw_data, user_id, "test_data")

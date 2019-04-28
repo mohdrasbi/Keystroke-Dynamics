@@ -10,7 +10,7 @@ import os
 
 
 class CollectData:
-	def __init__(self, user_id):
+	def __init__(self, user_id, dir_name):
 		self.timestamps = {}
 		self.raw_data = []
 		self.user_id = user_id
@@ -24,7 +24,7 @@ class CollectData:
 		self.df = pd.DataFrame(np.array(self.raw_data), columns=['key', 'press_time', 'release_time', 'hold_time'])
 		self.df = self.df.sort_values(by=['press_time'])
 		
-		self.save_file(self.df)
+		self.save_file(self.df, dir_name)
 
 
 	def on_press(self, key):
@@ -80,8 +80,8 @@ class CollectData:
 		return self.df
 
 
-	def save_file(self, df):
-		path = "data/user_{}/raw_data".format(self.user_id)
+	def save_file(self, df, dir_name):
+		path = "{}/user_{}/raw_data".format(dir_name, self.user_id)
 		if not os.path.exists(path):
 			os.makedirs(path)
 
@@ -100,7 +100,7 @@ class CollectData:
 
 
 class ExtractFeatures:
-	def __init__(self, df, user_id):
+	def __init__(self, df, user_id, dir_name):
 		self.df = df
 		self.user_id = user_id
 		self.info_dict, self.features = self.initialize()
@@ -110,7 +110,7 @@ class ExtractFeatures:
 		self.new_df = self.new_df.fillna(self.new_df.mean())
 		self.new_df = self.new_df.fillna(0)
 		
-		self.save_file(self.new_df)
+		self.save_file(self.new_df, dir_name)
 
 	def extract_features(self):
 		length = self.df.shape[0]
@@ -241,8 +241,8 @@ class ExtractFeatures:
 		return self.new_df
 
 
-	def save_file(self, df):
-		path = "data/user_{}/final_data".format(self.user_id)
+	def save_file(self, df, dir_name):
+		path = "{}/user_{}/final_data".format(dir_name, self.user_id)
 		if not os.path.exists(path):
 			os.makedirs(path)
 
