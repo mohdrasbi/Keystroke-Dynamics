@@ -147,50 +147,54 @@ class ExtractFeatures:
 			if curr_key == None:
 				continue
 
-			if curr_key.isupper():
+			if curr_key.isupper() or prev_key.isupper():
 				continue
 
 			if curr_key not in info_dict_keys or prev_key not in info_dict_keys:
 				if ((curr_key != "Key.space") and (prev_key != "Key.space") and (curr_key not in shift)) or (curr_key not in info_dict_keys):
 					continue
 				
+			try:
+				if (curr_key in self.info_dict.keys()) and (prev_key in self.info_dict.keys()) and (self.info_dict[curr_key] == self.info_dict[prev_key]):
+					feat_transition = "{}_same".format(self.info_dict[curr_key])
+					feat_ht = "{}_ht".format(self.info_dict[curr_key])
 
-			if (curr_key in self.info_dict.keys()) and (prev_key in self.info_dict.keys()) and (self.info_dict[curr_key] == self.info_dict[prev_key]):
-				feat_transition = "{}_same".format(self.info_dict[curr_key])
-				feat_ht = "{}_ht".format(self.info_dict[curr_key])
-
-				feat_values[self.feat_map[feat_transition]].append(curr_time - prev_time)
-				feat_values[self.feat_map[feat_ht]].append(float(curr['hold_time']))
-			
-			elif curr_key == "Key.space":
-				feat_values[self.feat_map["sb_dd"]].append(curr_time - prev_time)
-				feat_values[self.feat_map["sb_ht"]].append(float(curr['hold_time']))
-			
-			elif curr_key in shift:
-				next_key = self.df.iloc[i+1]['key'].upper()
-
-				if next_key in info_dict_keys:
-					feat_ht = "{}_ht".format(self.info_dict[next_key])
+					feat_values[self.feat_map[feat_transition]].append(curr_time - prev_time)
 					feat_values[self.feat_map[feat_ht]].append(float(curr['hold_time']))
-
-			elif prev_key == "Key.space":
-				feat_transition = 'key_sb'
-				feat_ht = "{}_ht".format(self.info_dict[curr_key])
 				
-				feat_values[self.feat_map[feat_transition]].append(curr_time - prev_time)
-				feat_values[self.feat_map[feat_ht]].append(float(curr['hold_time']))
-			
-			else:		
-				temp = ""
-				if self.info_dict[prev_key][0] == "l":
-					temp = "left"
-				elif self.info_dict[prev_key][0] == "r":
-					temp = "right"
+				elif curr_key == "Key.space":
+					feat_values[self.feat_map["sb_dd"]].append(curr_time - prev_time)
+					feat_values[self.feat_map["sb_ht"]].append(float(curr['hold_time']))
+				
+				elif curr_key in shift:
+					next_key = self.df.iloc[i+1]['key'].upper()
 
-				feat_transition = "{}_{}".format(self.info_dict[curr_key], temp)
-				feat_ht = "{}_ht".format(self.info_dict[curr_key])
-				feat_values[self.feat_map[feat_transition]].append(curr_time - prev_time)
-				feat_values[self.feat_map[feat_ht]].append(curr_time - prev_time)
+					if next_key in info_dict_keys:
+						feat_ht = "{}_ht".format(self.info_dict[next_key])
+						feat_values[self.feat_map[feat_ht]].append(float(curr['hold_time']))
+
+				elif prev_key == "Key.space":
+					feat_transition = 'key_sb'
+					feat_ht = "{}_ht".format(self.info_dict[curr_key])
+					
+					feat_values[self.feat_map[feat_transition]].append(curr_time - prev_time)
+					feat_values[self.feat_map[feat_ht]].append(float(curr['hold_time']))
+				
+				else:		
+					temp = ""
+					if self.info_dict[prev_key][0] == "l":
+						temp = "left"
+					elif self.info_dict[prev_key][0] == "r":
+						temp = "right"
+
+					feat_transition = "{}_{}".format(self.info_dict[curr_key], temp)
+					feat_ht = "{}_ht".format(self.info_dict[curr_key])
+					feat_values[self.feat_map[feat_transition]].append(curr_time - prev_time)
+					feat_values[self.feat_map[feat_ht]].append(curr_time - prev_time)
+
+
+			except KeyError:
+				continue
 
 			
 			if time_diff >= bin_size:
