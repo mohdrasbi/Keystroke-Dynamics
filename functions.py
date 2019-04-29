@@ -261,6 +261,39 @@ class ExtractFeatures:
 		df.to_csv(os.path.join(path, "{}.csv".format(index)), index=False)
 
 
+class FitAndPredict:
+	def __init__(self, user_id):
+		self.user_id = user_id
+		self.x_train, self.y_train = None, None
+		self.x_test, self.y_test = None, None
+
+	def getData(self):
+		train_path = "train_data/user_" + str(self.user_id) + "/final_data/"
+		test_path = "test_data/user_" + str(self.user_id) + "/final_data/"
+		train_file = sorted(os.listdir(train_path))[-1]
+		test_file = sorted(os.listdir(test_path))[-1]
+		df_train = pd.read_csv(train_path + train_file)
+		self.y_train = df_train['user'].values
+		df_train = df_train.drop(['user'], axis=1)
+		self.x_train = df_train.values
+		df_test = pd.read_csv(test_path + test_file)
+		self.y_test = df_test['user'].values
+		df_test = df_test.drop(['user'], axis=1)
+		self.x_test = df_test.values
+
+	def SVM_classifier(self):
+		self.getData()
+		clf = svm.OneClassSVM(nu=0.1, kernel="rbf", gamma=0.001)
+		clf.fit(self.x_train)
+		y_test_pred = clf.predict(self.x_test)
+		unique, counts = np.unique(y_test_pred, return_counts=True)
+		counts_dict = dict(zip(unique, counts))
+		if 1 in counts_dict:
+			match = (counts_dict[1] / len(y_test_pred)) * 100
+		else:
+			match = 0
+		return match
+
 
 
 
