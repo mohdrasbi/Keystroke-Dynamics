@@ -4,6 +4,7 @@ import pandas as pd
 import time
 import glob
 import os
+from sklearn import svm
 
 
 #########################################
