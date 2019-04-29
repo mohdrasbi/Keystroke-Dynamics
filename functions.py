@@ -282,6 +282,9 @@ class FitAndPredict:
 		df_test = df_test.drop(['user'], axis=1)
 		self.x_test = df_test.values
 
+		print(train_path+train_file)
+		print(test_path+test_file)
+
 	def SVM_classifier(self):
 		self.getData()
 		clf = svm.OneClassSVM(nu=0.1, kernel="rbf", gamma=0.001)
