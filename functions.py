@@ -9,6 +9,15 @@ from sklearn import svm
 
 #########################################
 
+def last_csv_file(path):
+	l = os.listdir(path + "/")
+	index = max(list(map(lambda x: int(x.split('.')[0]) if x.split('.')[0] != '' else 0, l)))
+	file = "{}.csv".format(index)
+
+	return file
+
+
+#########################################
 
 class CollectData:
 	def __init__(self, user_id, dir_name):
@@ -272,26 +281,19 @@ class FitAndPredict:
 		train_path = "train_data/user_" + str(self.user_id) + "/final_data/"
 		test_path = "test_data/user_" + str(self.user_id) + "/final_data/"
 		
-		l_train = os.listdir(train_path)
-		index_train = max(list(map(lambda x: int(x.split('.')[0]) if x.split('.')[0] != '' else 0, l_train)))
-		train_file = "{}.csv".format(index_train)
-
-		l_test = os.listdir(test_path)
-		index_test = max(list(map(lambda x: int(x.split('.')[0]) if x.split('.')[0] != '' else 0, l_test)))
-		test_file = "{}.csv".format(index_test)
-
+		train_file = last_csv_file(train_path)
+		test_file = last_csv_file(test_path)
 
 		df_train = pd.read_csv(train_path + train_file)
 		self.y_train = df_train['user'].values
 		df_train = df_train.drop(['user'], axis=1)
 		self.x_train = df_train.values
+
 		df_test = pd.read_csv(test_path + test_file)
 		self.y_test = df_test['user'].values
 		df_test = df_test.drop(['user'], axis=1)
 		self.x_test = df_test.values
 
-		print(train_path+train_file)
-		print(test_path+test_file)
 
 	def SVM_classifier(self):
 		self.getData()
