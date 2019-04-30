@@ -297,7 +297,7 @@ class FitAndPredict:
 
 	def SVM_classifier(self):
 		self.getData()
-		clf = svm.OneClassSVM(nu=0.1, kernel="rbf", gamma=0.001)
+		clf = svm.OneClassSVM(nu=0.1, kernel="rbf", gamma=0.001, tol=2)
 		clf.fit(self.x_train)
 		y_test_pred = clf.predict(self.x_test)
 		unique, counts = np.unique(y_test_pred, return_counts=True)
