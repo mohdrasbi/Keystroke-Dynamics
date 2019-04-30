@@ -271,8 +271,16 @@ class FitAndPredict:
 	def getData(self):
 		train_path = "train_data/user_" + str(self.user_id) + "/final_data/"
 		test_path = "test_data/user_" + str(self.user_id) + "/final_data/"
-		train_file = sorted(os.listdir(train_path))[-1]
-		test_file = sorted(os.listdir(test_path))[-1]
+		
+		l_train = os.listdir(train_path)
+		index_train = max(list(map(lambda x: int(x.split('.')[0]) if x.split('.')[0] != '' else 0, l_train)))
+		train_file = "{}.csv".format(index_train)
+
+		l_test = os.listdir(test_path)
+		index_test = max(list(map(lambda x: int(x.split('.')[0]) if x.split('.')[0] != '' else 0, l_test)))
+		test_file = "{}.csv".format(index_test)
+
+
 		df_train = pd.read_csv(train_path + train_file)
 		self.y_train = df_train['user'].values
 		df_train = df_train.drop(['user'], axis=1)
